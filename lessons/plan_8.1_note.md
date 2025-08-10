@@ -1,0 +1,1 @@
+Ważne: Jeżeli korzystasz z Supabase, w db-plan.md należy wprost napisać że tabela “users” będzie obsługiwana przez Supabase Auth, jak na poniższym screenie. W innym przypadku migracja utworzy osobną tabelę public.users, która nie wniesie wszystkich dobrodziejstw dostępnych w Supabase Auth.
