@@ -14,6 +14,12 @@ This document provides a reproducible guide to create the necessary file structu
 - Ensure that `/supabase/config.toml` exists
 - Ensure that a file `/src/db/database.types.ts` exists and contains the correct type definitions for your database.
 
+```sh
+npm install @supabase/supabase-js
+mkdir src/db
+supabase gen types typescript --local > src/db/database.types.ts
+```
+
 IMPORTANT: Check prerequisites before perfoming actions below. If they're not met, stop and ask a user for the fix.
 
 ## File Structure and Setup

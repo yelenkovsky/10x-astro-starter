@@ -1,94 +1,122 @@
 # 10x Astro Starter
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+A modern, production-ready starter template for building web applications with Astro, featuring a comprehensive tech stack and best practices.
+
+## Table of Contents
+
+- [10x Astro Starter](#10x-astro-starter)
+  - [Table of Contents](#table-of-contents)
+  - [Project Description](#project-description)
+  - [Tech Stack](#tech-stack)
+    - [Frontend](#frontend)
+    - [Backend \& Database](#backend--database)
+    - [Development Tools](#development-tools)
+    - [UI Components](#ui-components)
+  - [Getting Started Locally](#getting-started-locally)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [Available Scripts](#available-scripts)
+  - [Project Scope](#project-scope)
+  - [Project Status](#project-status)
+  - [License](#license)
+
+## Project Description
+
+The 10x Astro Starter is designed to accelerate your web development workflow by providing a solid foundation with modern technologies and best practices. This starter template includes everything you need to build fast, scalable web applications with excellent developer experience.
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+### Frontend
+- **Astro 5** - Modern static site generator with dynamic capabilities
+- **React 19** - Latest React version for interactive components
+- **TypeScript 5** - Type-safe JavaScript development
+- **Tailwind CSS 4** - Utility-first CSS framework
 
-## Prerequisites
+### Backend & Database
+- **Supabase** - Open-source Firebase alternative with PostgreSQL
+- **Real-time features** - Live data synchronization
+- **Authentication** - Built-in user management
+- **Database** - PostgreSQL with type-safe queries
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+### Development Tools
+- **ESLint** - Code quality and consistency
+- **Prettier** - Code formatting
+- **TypeScript** - Static type checking
+- **Vite** - Fast build tool (via Astro)
 
-## Getting Started
+### UI Components
+- **Shadcn/ui** - High-quality, accessible component library
 
-1. Clone the repository:
+## Getting Started Locally
 
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
+### Prerequisites
+- Node.js 18.0.0 or higher
+- npm or yarn package manager
 
-2. Install dependencies:
+### Installation
 
-```bash
-npm install
-```
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd 10x-astro-starter
+   ```
 
-3. Run the development server:
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-```
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your configuration
+   ```
 
-4. Build for production:
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm run build
-```
+5. **Open your browser**
+   Navigate to `http://localhost:4321`
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server with hot reload |
+| `npm run build` | Build the project for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint to check code quality |
+| `npm run format` | Format code with Prettier |
 
-## Project Structure
+## Project Scope
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+This starter template is designed for building full-stack web applications with:
 
-## AI Development Support
+- **Static Site Generation** - Fast, SEO-friendly pages
+- **Dynamic Components** - Interactive React components where needed
+- **Database Integration** - Type-safe database operations with Supabase
+- **Authentication** - User management and security
+- **Real-time Features** - Live data updates and collaboration
+- **Responsive Design** - Mobile-first approach with Tailwind CSS
+- **Type Safety** - Full TypeScript support throughout the stack
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+## Project Status
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
+🚀 **Ready for Development**
 
-### Cursor IDE
+The project is fully configured and ready for immediate development. All core dependencies are installed, and the development environment is set up with best practices for:
 
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
-
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+- Code quality and formatting
+- Type safety
+- Performance optimization
+- Developer experience
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Built with ❤️ using modern web technologies**
