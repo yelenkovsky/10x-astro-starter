@@ -1,290 +1,298 @@
 # REST API Plan
 
+This document outlines the REST API for the 10x-cards application, designed to support user authentication, flashcard management, and a spaced repetition system (SRS) for learning.
+
 ## 1. Resources
 
-- **Users** - User accounts and profiles (managed by Supabase Auth)
-- **Flashcards** - Individual flashcard content and metadata
-- **Learning Progress** - Spaced repetition tracking data
-- **Generation Statistics** - AI generation metrics per user
-- **Learning Sessions** - Study session management
-- **AI Generation** - Temporary flashcard generation and review
+-   **Users**: Represents user profiles. Corresponds to the `profiles` table.
+-   **Flashcards**: Represents individual flashcards. Corresponds to the `flashcards` table.
+-   **Reviews**: A conceptual resource for managing learning sessions. It interacts with the `user_flashcard_repetition` table.
 
 ## 2. Endpoints
 
-### Authentication (Supabase Auth)
-- **POST** `/auth/register` - User registration
-- **POST** `/auth/login` - User login
-- **POST** `/auth/logout` - User logout
-- **POST** `/auth/refresh` - Refresh access token
+### Users
+
+#### Get current user profile
+
+-   **Method**: `GET`
+-   **Path**: `/api/users/me`
+-   **Description**: Retrieves the profile of the currently authenticated user.
+-   **Request Payload**: None
+-   **Response Payload**:
+    ```json
+    {
+      "id": "c5b6b2f0-9g9h-4i4j-5k5l-6m6n7o8p9q0r",
+      "created_at": "2023-10-27T10:00:00Z",
+      "updated_at": "2023-10-27T10:00:00Z",
+      "avatar_url": "https://example.com/avatar.png"
+    }
+    ```
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `401 Unauthorized`: If the user is not authenticated.
+    -   `404 Not Found`: If the user's profile does not exist.
+
+#### Update current user profile
+
+-   **Method**: `PATCH`
+-   **Path**: `/api/users/me`
+-   **Description**: Updates the profile of the currently authenticated user.
+-   **Request Payload**:
+    ```json
+    {
+      "avatar_url": "https://example.com/new-avatar.png"
+    }
+    ```
+-   **Response Payload**: The updated user profile object.
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `400 Bad Request`: If the request payload is invalid.
+    -   `401 Unauthorized`: If the user is not authenticated.
+
+#### Delete current user account
+
+-   **Method**: `DELETE`
+-   **Path**: `/api/users/me`
+-   **Description**: Deletes the account and all associated data of the currently authenticated user.
+-   **Request Payload**: None
+-   **Response Payload**: None
+-   **Success Code**: `204 No Content`
+-   **Error Codes**:
+    -   `401 Unauthorized`: If the user is not authenticated.
 
 ### Flashcards
 
-#### **GET** `/api/flashcards`
-Retrieve user's flashcards with pagination and filtering
-- **Query Parameters:**
-  - `page` (integer, default: 1)
-  - `limit` (integer, default: 20, max: 100)
-  - `is_ai_generated` (boolean, optional)
-  - `is_accepted` (boolean, optional)
-  - `sort_by` (string: "created_at", "updated_at", default: "created_at")
-  - `sort_order` (string: "asc", "desc", default: "desc")
-- **Response:**
-```json
-{
-  "data": [
+#### Get a list of flashcards
+
+-   **Method**: `GET`
+-   **Path**: `/api/flashcards`
+-   **Description**: Retrieves a paginated list of flashcards for the authenticated user.
+-   **Query Parameters**:
+    -   `page` (integer, optional, default: 1): The page number for pagination.
+    -   `pageSize` (integer, optional, default: 20): The number of items per page.
+    -   `sortBy` (string, optional, default: 'created_at'): Field to sort by.
+    -   `order` (string, optional, default: 'desc'): Sort order ('asc' or 'desc').
+-   **Response Payload**:
+    ```json
     {
-      "id": "uuid",
-      "front": "string",
-      "back": "string",
-      "is_ai_generated": boolean,
-      "is_accepted": boolean,
-      "created_at": "ISO-8601",
-      "updated_at": "ISO-8601"
+      "data": [
+        {
+          "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+          "user_id": "c5b6b2f0-9g9h-4i4j-5k5l-6m6n7o8p9q0r",
+          "created_at": "2023-10-27T10:00:00Z",
+          "updated_at": "2023-10-27T10:00:00Z",
+          "front": "What is the capital of France?",
+          "back": "Paris",
+          "origin": "manual",
+          "source_text": null
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "pageSize": 20,
+        "totalItems": 1,
+        "totalPages": 1
+      }
     }
-  ],
-  "pagination": {
-    "page": 1,
-    "limit": 20,
-    "total": 150,
-    "total_pages": 8
-  }
-}
-```
-- **Success Codes:** 200 OK
-- **Error Codes:** 401 Unauthorized, 400 Bad Request
+    ```
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `401 Unauthorized`: If the user is not authenticated.
 
-#### **POST** `/api/flashcards`
-Create a new manual flashcard
-- **Request Payload:**
-```json
-{
-  "front": "string (max 500 chars)",
-  "back": "string (max 500 chars)"
-}
-```
-- **Response:** 201 Created with created flashcard object
-- **Success Codes:** 201 Created
-- **Error Codes:** 400 Bad Request (validation), 401 Unauthorized
+#### Get a single flashcard
 
-#### **GET** `/api/flashcards/{id}`
-Retrieve a specific flashcard
-- **Response:** 200 OK with flashcard object
-- **Success Codes:** 200 OK
-- **Error Codes:** 401 Unauthorized, 404 Not Found
+-   **Method**: `GET`
+-   **Path**: `/api/flashcards/{id}`
+-   **Description**: Retrieves a single flashcard by its ID.
+-   **Response Payload**: A single flashcard object.
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `401 Unauthorized`: If the user is not authenticated.
+    -   `404 Not Found`: If the flashcard does not exist or the user does not have access.
 
-#### **PUT** `/api/flashcards/{id}`
-Update an existing flashcard
-- **Request Payload:**
-```json
-{
-  "front": "string (max 500 chars)",
-  "back": "string (max 500 chars)"
-}
-```
-- **Response:** 200 OK with updated flashcard object
-- **Success Codes:** 200 OK
-- **Error Codes:** 400 Bad Request, 401 Unauthorized, 404 Not Found
+#### Create a single flashcard
 
-#### **DELETE** `/api/flashcards/{id}`
-Delete a flashcard
-- **Response:** 204 No Content
-- **Success Codes:** 204 No Content
-- **Error Codes:** 401 Unauthorized, 404 Not Found
-
-### AI Flashcard Generation
-
-#### **POST** `/api/flashcards/generate`
-Generate flashcards from text using AI
-- **Request Payload:**
-```json
-{
-  "text": "string (1000-10000 chars)",
-  "count": "integer (1-20, default: 10)"
-}
-```
-- **Response:** 200 OK with generated flashcards
-```json
-{
-  "data": [
+-   **Method**: `POST`
+-   **Path**: `/api/flashcards`
+-   **Description**: Creates a new flashcard manually.
+-   **Request Payload**:
+    ```json
     {
-      "id": "temp-uuid",
-      "front": "string",
-      "back": "string",
-      "is_ai_generated": true,
-      "is_accepted": false,
-      "confidence_score": "decimal (0.0-1.0)"
+      "front": "What is the powerhouse of the cell?",
+      "back": "Mitochondria"
     }
-  ],
-  "generation_metadata": {
-    "total_generated": 10,
-    "processing_time_ms": 1500
-  }
-}
-```
-- **Success Codes:** 200 OK
-- **Error Codes:** 400 Bad Request, 401 Unauthorized, 500 Internal Server Error
+    ```
+-   **Response Payload**: The newly created flashcard object.
+-   **Success Code**: `201 Created`
+-   **Error Codes**:
+    -   `400 Bad Request`: If validation fails (e.g., `front` or `back` is missing).
+    -   `401 Unauthorized`: If the user is not authenticated.
 
-#### **POST** `/api/flashcards/generate/approve`
-Approve selected AI-generated flashcards
-- **Request Payload:**
-```json
-{
-  "flashcard_ids": ["uuid1", "uuid2"],
-  "reject_ids": ["uuid3", "uuid4"]
-}
-```
-- **Response:** 200 OK with approval results
-- **Success Codes:** 200 OK
-- **Error Codes:** 400 Bad Request, 401 Unauthorized
+#### Create flashcards in batch
 
-### Learning Progress
+-   **Method**: `POST`
+-   **Path**: `/api/flashcards/batch`
+-   **Description**: Creates multiple flashcards at once, typically after AI generation and user approval.
+-   **Request Payload**:
+    ```json
+    [
+      {
+        "front": "Generated Question 1",
+        "back": "Generated Answer 1",
+        "origin": "ai-generated",
+        "source_text": "The source text..."
+      },
+      {
+        "front": "Generated Question 2",
+        "back": "Generated Answer 2",
+        "origin": "ai-generated",
+        "source_text": "The source text..."
+      }
+    ]
+    ```
+-   **Response Payload**: An array of the newly created flashcard objects.
+-   **Success Code**: `201 Created`
+-   **Error Codes**:
+    -   `400 Bad Request`: If the request payload is invalid.
+    -   `401 Unauthorized`: If the user is not authenticated.
 
-#### **GET** `/api/learning-progress`
-Retrieve user's learning progress
-- **Query Parameters:**
-  - `page` (integer, default: 1)
-  - `limit` (integer, default: 20)
-  - `next_review_date` (ISO-8601, optional)
-  - `difficulty_rating` (integer 1-5, optional)
-- **Response:** 200 OK with learning progress data
-- **Success Codes:** 200 OK
-- **Error Codes:** 401 Unauthorized
+#### Update a flashcard
 
-#### **PUT** `/api/learning-progress/{flashcard_id}`
-Update learning progress for a specific flashcard
-- **Request Payload:**
-```json
-{
-  "difficulty_rating": "integer (1-5)",
-  "algorithm_metadata": "object (optional)"
-}
-```
-- **Response:** 200 OK with updated progress
-- **Success Codes:** 200 OK
-- **Error Codes:** 400 Bad Request, 401 Unauthorized, 404 Not Found
+-   **Method**: `PATCH`
+-   **Path**: `/api/flashcards/{id}`
+-   **Description**: Updates an existing flashcard.
+-   **Request Payload**:
+    ```json
+    {
+      "front": "An updated question?",
+      "back": "An updated answer."
+    }
+    ```
+-   **Response Payload**: The updated flashcard object.
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `400 Bad Request`: If the request payload is invalid.
+    -   `401 Unauthorized`: If the user is not authenticated.
+    -   `404 Not Found`: If the flashcard does not exist.
 
-### Learning Sessions
+#### Delete a flashcard
 
-#### **POST** `/api/learning-sessions/start`
-Start a new learning session
-- **Request Payload:**
-```json
-{
-  "session_type": "string (new, review, mixed)",
-  "max_cards": "integer (1-100, default: 20)"
-}
-```
-- **Response:** 201 Created with session details
-```json
-{
-  "id": "uuid",
-  "started_at": "ISO-8601",
-  "total_cards": 20,
-  "session_type": "mixed",
-  "current_card": {
-    "flashcard_id": "uuid",
-    "front": "string",
-    "progress_id": "uuid"
-  }
-}
-```
-- **Success Codes:** 201 Created
-- **Error Codes:** 400 Bad Request, 401 Unauthorized
+-   **Method**: `DELETE`
+-   **Path**: `/api/flashcards/{id}`
+-   **Description**: Deletes a flashcard by its ID.
+-   **Response Payload**: None
+-   **Success Code**: `204 No Content`
+-   **Error Codes**:
+    -   `401 Unauthorized`: If the user is not authenticated.
+    -   `404 Not Found`: If the flashcard does not exist.
 
-#### **GET** `/api/learning-sessions/{id}/next-card`
-Get the next card in the learning session
-- **Response:** 200 OK with next card data
-- **Success Codes:** 200 OK
-- **Error Codes:** 401 Unauthorized, 404 Not Found
+#### Generate flashcard suggestions
 
-#### **PUT** `/api/learning-sessions/{id}/rate-card`
-Rate the current card and get next card
-- **Request Payload:**
-```json
-{
-  "flashcard_id": "uuid",
-  "difficulty_rating": "integer (1-5)",
-  "response_time_ms": "integer (optional)"
-}
-```
-- **Response:** 200 OK with next card or session completion
-- **Success Codes:** 200 OK
-- **Error Codes:** 400 Bad Request, 401 Unauthorized, 404 Not Found
+-   **Method**: `POST`
+-   **Path**: `/api/flashcards/generate`
+-   **Description**: Generates flashcard suggestions from a source text using an LLM.
+-   **Request Payload**:
+    ```json
+    {
+      "source_text": "A long piece of text to generate flashcards from..."
+    }
+    ```
+-   **Response Payload**: An array of suggested flashcard objects (not saved to the database).
+    ```json
+    [
+      {
+        "front": "Suggested Question 1",
+        "back": "Suggested Answer 1"
+      },
+      {
+        "front": "Suggested Question 2",
+        "back": "Suggested Answer 2"
+      }
+    ]
+    ```
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `400 Bad Request`: If `source_text` is invalid (e.g., too short or too long).
+    -   `401 Unauthorized`: If the user is not authenticated.
+    -   `500 Internal Server Error`: If there is an issue with the LLM API.
 
-#### **PUT** `/api/learning-sessions/{id}/complete`
-Complete the learning session
-- **Response:** 200 OK with session summary
-- **Success Codes:** 200 OK
-- **Error Codes:** 401 Unauthorized, 404 Not Found
+### Reviews (Learning Session)
 
-### Generation Statistics
+#### Get a learning session
 
-#### **GET** `/api/generation-statistics`
-Retrieve user's generation statistics
-- **Response:** 200 OK with statistics data
-```json
-{
-  "total_generated": 150,
-  "total_accepted": 112,
-  "total_manual_created": 25,
-  "acceptance_rate": 0.75,
-  "ai_usage_rate": 0.82,
-  "last_generation_date": "ISO-8601"
-}
-```
-- **Success Codes:** 200 OK
-- **Error Codes:** 401 Unauthorized
+-   **Method**: `GET`
+-   **Path**: `/api/reviews/session`
+-   **Description**: Retrieves a list of flashcards due for review for the current user.
+-   **Query Parameters**:
+    -   `limit` (integer, optional, default: 10): Maximum number of cards to retrieve for the session.
+-   **Response Payload**: An array of flashcard objects with their repetition data.
+    ```json
+    [
+      {
+        "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+        "front": "What is the capital of France?",
+        "back": "Paris",
+        "repetition": {
+            "id": "f0e9d8c7-b6a5-4321-fedc-ba9876543210",
+            "next_review_date": "2023-10-27T10:00:00Z"
+        }
+      }
+    ]
+    ```
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `401 Unauthorized`: If the user is not authenticated.
+
+#### Update flashcard review status
+
+-   **Method**: `PATCH`
+-   **Path**: `/api/reviews/{flashcard_id}`
+-   **Description**: Updates the spaced repetition data for a flashcard based on user performance in a review session.
+-   **Request Payload**:
+    ```json
+    {
+      "performance_rating": "good"
+    }
+    ```
+-   **Response Payload**: The updated repetition object.
+    ```json
+    {
+      "id": "f0e9d8c7-b6a5-4321-fedc-ba9876543210",
+      "user_id": "c5b6b2f0-9g9h-4i4j-5k5l-6m6n7o8p9q0r",
+      "flashcard_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      "interval": 3,
+      "ease_factor": 2.6,
+      "next_review_date": "2023-10-30T10:00:00Z"
+    }
+    ```
+-   **Success Code**: `200 OK`
+-   **Error Codes**:
+    -   `400 Bad Request`: If `performance_rating` is invalid.
+    -   `401 Unauthorized`: If the user is not authenticated.
+    -   `404 Not Found`: If the flashcard or its repetition data does not exist.
 
 ## 3. Authentication and Authorization
 
-**Authentication Mechanism:** Supabase JWT-based authentication
-- All API endpoints require valid JWT token in Authorization header
-- Token format: `Authorization: Bearer <jwt_token>`
-- Token validation handled by Supabase middleware
-
-**Authorization Implementation:**
-- Row Level Security (RLS) policies enforce user isolation
-- All database queries filtered by `auth.uid()`
-- No cross-user data access possible
-- User ID extracted from JWT token for all operations
+-   **Authentication**: The API will use JSON Web Tokens (JWT) provided by Supabase Auth. The client is responsible for handling the authentication flow (login, signup) using the Supabase client-side library. Every request to a protected endpoint must include an `Authorization` header with a Bearer token: `Authorization: Bearer <SUPABASE_JWT>`.
+-   **Authorization**: Authorization is enforced at the database level using PostgreSQL's Row-Level Security (RLS). Policies are configured on the `profiles`, `flashcards`, and `user_flashcard_repetition` tables to ensure that users can only access and modify their own data. The user ID from the JWT (`auth.uid()`) is used in these policies.
 
 ## 4. Validation and Business Logic
 
-### Validation Conditions
+### Validation
 
-**Flashcards:**
-- `front` and `back`: Required, max 500 characters
-- `user_id`: Automatically set from authenticated user
+-   **User Profile**:
+    -   `avatar_url`: Must be a valid URL format.
+-   **Flashcards**:
+    -   `front`: Required, must be a non-empty string.
+    -   `back`: Required, must be a non-empty string.
+    -   `origin`: Must be one of `['manual', 'ai-generated', 'ai-edited']`.
+-   **Flashcard Generation**:
+    -   `source_text`: Required, must be a string between 1000 and 10,000 characters.
+-   **Reviews**:
+    -   `performance_rating`: Required, must be a recognized value from the set used by the SRS algorithm (e.g., `'again'`, `'hard'`, `'good'`, `'easy'`).
 
-**Learning Progress:**
-- `difficulty_rating`: Integer 1-5, required
-- `ease_factor`: Decimal 4,3 precision, default 2.5
-- `interval_days`: Integer, minimum 1
+### Business Logic
 
-**AI Generation:**
-- `text`: 1000-10000 characters
-- `count`: 1-20 flashcards per generation
-
-### Business Logic Implementation
-
-**Spaced Repetition Algorithm:**
-- Learning sessions automatically select cards based on `next_review_date`
-- Card difficulty ratings update `interval_days` and `ease_factor`
-- Algorithm metadata stored in JSONB for future enhancements
-
-**Flashcard Approval Workflow:**
-- AI-generated flashcards start as temporary (not saved to database)
-- User reviews and approves/rejects generated cards
-- Approved cards create learning progress records automatically
-- Statistics updated in real-time during approval process
-
-**Session Management:**
-- Learning sessions track individual study progress
-- Cards presented based on spaced repetition algorithm
-- Session completion updates all progress records
-- Performance metrics stored for analytics
-
-**Rate Limiting:**
-- AI generation: 10 requests per hour per user
-- General API: 1000 requests per hour per user
-- Authentication endpoints: 5 attempts per 15 minutes per IP
+-   **AI Generation**: The `POST /api/flashcards/generate` endpoint will internally call the Openrouter.ai service, sending the `source_text` and processing the LLM's response to format it into flashcard suggestions.
+-   **Spaced Repetition System (SRS)**: The `PATCH /api/reviews/{flashcard_id}` endpoint contains the core SRS logic. Based on the user's `performance_rating` and the flashcard's current state (`interval`, `ease_factor`), it will calculate the new `interval`, `ease_factor`, and `next_review_date` before updating the `user_flashcard_repetition` record.
+-   **Cascading Deletes**: When a user is deleted via `DELETE /api/users/me`, the `ON DELETE CASCADE` constraint in the database will automatically remove all their associated flashcards and repetition data.
