@@ -34,7 +34,207 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      flashcards: {
+        Row: {
+          back: string
+          created_at: string | null
+          front: string
+          id: string
+          is_accepted: boolean
+          is_ai_generated: boolean
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          back: string
+          created_at?: string | null
+          front: string
+          id?: string
+          is_accepted?: boolean
+          is_ai_generated?: boolean
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          back?: string
+          created_at?: string | null
+          front?: string
+          id?: string
+          is_accepted?: boolean
+          is_ai_generated?: boolean
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generation_statistics: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_generation_date: string | null
+          total_accepted: number
+          total_generated: number
+          total_manual_created: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_generation_date?: string | null
+          total_accepted?: number
+          total_generated?: number
+          total_manual_created?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_generation_date?: string | null
+          total_accepted?: number
+          total_generated?: number
+          total_manual_created?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_statistics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_progress: {
+        Row: {
+          algorithm_metadata: Json | null
+          created_at: string | null
+          difficulty_rating: number | null
+          ease_factor: number
+          flashcard_id: string
+          id: string
+          interval_days: number
+          last_review_date: string | null
+          next_review_date: string
+          review_count: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          algorithm_metadata?: Json | null
+          created_at?: string | null
+          difficulty_rating?: number | null
+          ease_factor?: number
+          flashcard_id: string
+          id?: string
+          interval_days?: number
+          last_review_date?: string | null
+          next_review_date?: string
+          review_count?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          algorithm_metadata?: Json | null
+          created_at?: string | null
+          difficulty_rating?: number | null
+          ease_factor?: number
+          flashcard_id?: string
+          id?: string
+          interval_days?: number
+          last_review_date?: string | null
+          next_review_date?: string
+          review_count?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_progress_flashcard_id_fkey"
+            columns: ["flashcard_id"]
+            isOneToOne: false
+            referencedRelation: "flashcards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_sessions: {
+        Row: {
+          completed_at: string | null
+          completed_cards: number
+          id: string
+          session_metadata: Json | null
+          started_at: string
+          total_cards: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_cards?: number
+          id?: string
+          session_metadata?: Json | null
+          started_at?: string
+          total_cards?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_cards?: number
+          id?: string
+          session_metadata?: Json | null
+          started_at?: string
+          total_cards?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
