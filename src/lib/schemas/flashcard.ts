@@ -15,4 +15,9 @@ export const FlashcardQueryParamsSchema = z.object({
   sort_order: z.enum(["asc", "desc"]).default("desc"),
 });
 
+export const CreateFlashcardSchema = z.object({
+  front: z.string().min(1),
+  back: z.string().min(1),
+});
+
 export type FlashcardQueryParams = z.infer<typeof FlashcardQueryParamsSchema>;
